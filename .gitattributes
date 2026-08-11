@@ -17,3 +17,5 @@
 *.jpg binary
 *.jpeg binary
 *.webp binary
+*.icns binary
+*.ico binary

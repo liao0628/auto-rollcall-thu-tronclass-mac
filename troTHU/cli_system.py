@@ -196,9 +196,9 @@ def config_advanced_command(json_output: bool=False) -> int:
         print(ctx.json_text(result))
     else:
         if result.get("ok"):
-            print("已用舊版記事本開啟 config.advanced.toml。")
+            print("已用文字編輯器開啟 config.advanced.toml。")
         else:
-            print("無法開啟舊版記事本: {}".format(result.get("reason", "unknown")))
+            print("無法開啟文字編輯器: {}".format(result.get("status", "unknown")))
     return 0 if result.get("ok") else 1
 
 

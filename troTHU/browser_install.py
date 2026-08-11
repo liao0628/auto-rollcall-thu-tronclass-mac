@@ -75,6 +75,11 @@ def browser_binary_present() -> bool:
     for p in path.glob("chromium-*"):
         if sys.platform.startswith("win"):
             executables = list(p.rglob("chrome.exe"))
+        elif sys.platform == "darwin":
+            # macOS ships Chromium as an app bundle (chrome-mac/Chromium.app/Contents/
+            # MacOS/Chromium) — there is no "chrome" binary to find, so the Windows/Linux
+            # name would never match and browser downloads would repeat every run.
+            executables = list(p.rglob("Chromium"))
         else:
             executables = list(p.rglob("chrome"))
         if executables and any(e.is_file() for e in executables):

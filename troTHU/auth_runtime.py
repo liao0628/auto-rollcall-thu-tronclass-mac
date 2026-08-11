@@ -105,7 +105,7 @@ LOGIN_NEEDS_USER_STATUSES = frozenset({
 # is asserted by tests/test_http_login.py so a new status can't ship message-less.
 # Secrets (password / captcha contents) are never included.
 _LOGIN_FAILURE_MESSAGES = {
-    'missing_credentials': '未設定帳號密碼。請按任意鍵編輯 config.conf，填好後關閉記事本。',
+    'missing_credentials': '未設定帳號密碼。請按任意鍵編輯 config.conf，填好後關閉編輯器。',
     'rejected': '登入失敗：帳號、密碼或驗證碼有誤，請確認後按任意鍵編輯 config.conf。',
     'login_page_changed': '登入頁結構與預期不符（學校可能改版）；將開啟瀏覽器讓你手動登入，或可用 webview import 匯入 Cookie。無人值守模式則持續偵測 Cookie 並重試。',
     'transient_error': '登入時發生暫時性錯誤（網路或伺服器），稍後會自動重試。',

@@ -429,7 +429,7 @@ def _default_basic_config_school_code_lines() -> str:
     return "\n".join("#   " + ", ".join(codes[i:i + 8]) for i in range(0, len(codes), 8))
 
 
-DEFAULT_BASIC_CONFIG_TEMPLATE = """# ===== 基本設定 config.conf =====（改完存檔關閉記事本即自動套用）
+DEFAULT_BASIC_CONFIG_TEMPLATE = """# ===== 基本設定 config.conf =====（改完存檔關閉編輯器即自動套用）
 # now：要用哪個帳號跑？填某帳號的 user，或填「class 群組名」。只有一個帳號可留空。
 #       也可填學校網址（如 https://tronclass.你的學校.edu.tw）→ 改用手動瀏覽器登入，免填帳密。
 now = AAAAA 或 class A 或 「class A」 擇一

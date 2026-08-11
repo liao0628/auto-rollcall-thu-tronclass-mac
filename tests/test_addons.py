@@ -385,8 +385,14 @@ class BrowserInstallTest(unittest.TestCase):
             
             chrome_dir = temp_path / "chromium-1234" / "chrome-bin"
             chrome_dir.mkdir(parents=True, exist_ok=True)
-            # browser_binary_present() globs chrome.exe on Windows, chrome elsewhere.
-            exe_name = "chrome.exe" if sys.platform.startswith("win") else "chrome"
+            # browser_binary_present() globs chrome.exe on Windows, the Chromium.app
+            # bundle binary on macOS, and chrome elsewhere (Linux).
+            if sys.platform.startswith("win"):
+                exe_name = "chrome.exe"
+            elif sys.platform == "darwin":
+                exe_name = "Chromium"
+            else:
+                exe_name = "chrome"
             (chrome_dir / exe_name).touch()
 
             self.assertTrue(browser_binary_present())

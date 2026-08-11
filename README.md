@@ -52,20 +52,29 @@
 
 第一次啟動會在 exe 旁邊自動建立 `config.conf`、`config.advanced.toml`、`state/`、`log/`。程式一啟動就直接進入監控；**按任意鍵**就會用記事本打開 `config.conf` 讓你填帳號密碼，存檔關掉記事本後它會自動重新讀取。
 
-### 我想用原始碼跑（開發者）
+### 我想在 macOS 上用
+
+沒有簽名／公證（沒有 Apple Developer 帳號），所以第一次執行 Gatekeeper 會擋下——對可執行檔跑一次 `xattr -dr com.apple.quarantine 那個資料夾路徑`，或在 Finder 對執行檔「按住 Control 點一下 → 開啟」放行即可，之後就正常。取得執行檔的方式：
+
+1. **到 Releases 頁面下載** `THU_Auto_Rollcall-vX.Y.Z-macos-arm64.zip`（如果專案有設定自動建置，見下面〈給維護者：自動建置＆發布〉）。
+2. **用原始碼跑**（開發者，見下一節）——功能與 Windows 版完全一致，包括「按任意鍵編輯 `config.conf`」（macOS 上會用 `open -e` 開啟 TextEdit）。
+
+### 我想用原始碼跑（開發者，Windows / macOS / Linux 皆可）
 
 ```bash
 python -m pip install -e .
 python -m troTHU.tron
 ```
 
-一樣啟動即監控、按任意鍵用記事本開 `config.conf`。要放進工作排程器、不想它監聽按鍵：
+一樣啟動即監控、按任意鍵開 `config.conf`（Windows 用記事本、macOS 用 TextEdit、Linux 用 `$VISUAL`/`$EDITOR`，都沒設定則退而找常見編輯器）。要放進工作排程器、不想它監聽按鍵：
 
 ```bash
 python -m troTHU.tron run --no-input
 ```
 
 > 啟動後它**不會清螢幕、不會跳全螢幕介面**，只會在視窗裡一行一行印出目前在做什麼（正在登入、目前時段、偵測到點名、簽到成功…），讓你一眼看出它還活著。
+
+> 📌 **macOS/Linux 小提醒：** 手動瀏覽器登入（貼學校網址那條路）需要 Playwright，記得裝 `pip install -e .[browser]` 並執行一次 `playwright install chromium --no-shell`；圖形驗證碼本地 OCR 是選用功能，需要另外 `pip install -e .[ocr]`（目前只有原始碼安裝支援，尚未做進 macOS 打包）。
 
 ---
 
@@ -472,6 +481,18 @@ aliases = ["我的學校"]   # 選填，讓使用者能用中文校名選校
 ```
 
 其餘欄位全選填；登入網址、登入方式、圖形驗證碼一律**自動偵測**。動手前先跑 `python -m troTHU.tron login-probe --school my_school` 看流程在真實伺服器上偵測到什麼。想送 PR 永久內建，就編輯資料檔 `troTHU/schools.toml` 加一個 `[<代號>]` 區塊。只有當某校的登入「協定」是現有特徵偵測完全涵蓋不到的全新型態時，才需要動 `login_flow.py` 加一條特徵偵測（以「協定／特徵」命名，絕不以學校命名）。
+
+### 給維護者：自動建置＆發布（Windows + macOS）
+
+`.github/workflows/build.yml` 在 GitHub 提供的雲端 Windows 機器和雲端 Mac 機器上分別跑 PyInstaller，建出 `auto-rollcall-thu-tronclass.exe` 和 macOS 版執行檔——**不需要自己擁有一台 Mac**。（這個 workflow 跟 `ci.yml` 分開放：`ci.yml` 只跑測試，不上傳任何產物；`build.yml` 才是真正會發布執行檔的地方。）
+
+用法（三步）：
+
+1. **push 到 GitHub。**
+2. **觸發建置：** 到 repo 的 Actions 分頁 → 點 **Build Executables** → 右上角 **Run workflow** 手動觸發一次；或是打 tag（例如 `git tag v1.8.4 && git push origin v1.8.4`），會連 GitHub Release 一起自動建立並附上兩個平台的 zip。
+3. **等 2–5 分鐘跑完**，該次紀錄下方的 **Artifacts** 就能下載 `THU_Auto_Rollcall-*-windows-x64.zip` / `THU_Auto_Rollcall-*-macos-arm64.zip`；打 tag 的話則直接到 Releases 頁面抓。
+
+macOS 建置出來的是**未簽章**執行檔（見上面〈我想在 macOS 上用〉的 Gatekeeper 放行說明）；`build-macos` job 用的就是 [auto-rollcall-thu-tronclass-mac.spec](auto-rollcall-thu-tronclass-mac.spec)。
 
 ### 安裝選用功能 / 測試
 

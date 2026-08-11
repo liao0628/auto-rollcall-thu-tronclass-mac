@@ -58,7 +58,7 @@ def build_arg_parser() -> ctx.argparse.ArgumentParser:
     config_compact.add_argument('--json', action='store_true', help='print JSON')
     config_doctor = config_subcommands.add_parser('doctor', help='檢查 config.conf 常見輸入問題')
     config_doctor.add_argument('--json', action='store_true', help='print JSON')
-    config_advanced = config_subcommands.add_parser('advanced', help='用舊版記事本開啟 config.advanced.toml')
+    config_advanced = config_subcommands.add_parser('advanced', help='用文字編輯器開啟 config.advanced.toml')
     config_advanced.add_argument('--json', action='store_true', help='print JSON')
     package_check_parser = subcommands.add_parser('package-check', help='run packaging and bundle diagnostics')
     package_check_parser.add_argument('--json', action='store_true', help='print JSON')

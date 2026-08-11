@@ -44,3 +44,48 @@ jobs:
 
       - name: Full unittest suite
         run: python -m unittest discover -v
+
+  build-macos:
+    # PyInstaller can't cross-compile — this is the only place that actually
+    # proves auto-rollcall-thu-tronclass-mac.spec builds a working binary on
+    # real Apple hardware. Not part of the Windows release pipeline
+    # (troTHU/release_builder.py); build + smoke-test only, verify-only like the
+    # unittest job's release-build --dry-run. Deliberately publishes nothing —
+    # no artifact-publishing step of any kind — CI here is a build gate, not a
+    # distribution channel; ship built binaries only through the maintainer's
+    # own reviewed release process.
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        # [browser] pulls in playwright so its Node driver is present for PyInstaller's
+        # collect_all("playwright") to bundle — the Chromium browser binary itself is
+        # downloaded separately at runtime and isn't needed to build or smoke-test here.
+        run: |
+          python -m pip install -e .[browser]
+          python -m pip install "PyInstaller>=6"
+
+      - name: Build (PyInstaller)
+        run: >-
+          python -m PyInstaller auto-rollcall-thu-tronclass-mac.spec
+          --clean --noconfirm
+          --distpath dist/pyinstaller
+          --workpath build/release/pyinstaller-work
+
+      - name: Smoke test the built binary
+        run: |
+          BIN=dist/pyinstaller/auto-rollcall-thu-tronclass/auto-rollcall-thu-tronclass
+          chmod +x "$BIN"
+          "$BIN" --help
+          "$BIN" status --json
+          # package-check may warn/fail on the lean bundle's intentionally-excluded
+          # optional extras (browser/keyring/qr-image) — same as the Windows release
+          # smoke test (troTHU/release_builder.py's _smoke_artifact), non-fatal here.
+          "$BIN" package-check --json || true

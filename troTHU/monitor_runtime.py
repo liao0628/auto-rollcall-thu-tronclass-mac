@@ -469,12 +469,12 @@ async def monitor_loop(
                     continue
                 remaining = max(1, int(round(next_login_retry_at - now)))
                 if unauth_notice_state != 'retry:{}'.format(login_retry_attempt):
-                    ctx.status_print('尚未登入，等待自動重試；若要修改設定，請按任意鍵編輯 config.conf，關閉記事本後會重新載入。')
+                    ctx.status_print('尚未登入，等待自動重試；若要修改設定，請按任意鍵編輯 config.conf，關閉編輯器後會重新載入。')
                     unauth_notice_state = 'retry:{}'.format(login_retry_attempt)
                 await ctx.sleep_or_shutdown(shutdown_event, min(5.0, float(remaining)))
             else:
                 if unauth_notice_state != 'manual_config':
-                    ctx.status_print('偵測到尚未登入。請按任意鍵編輯 config.conf，填好帳號密碼後關閉記事本。')
+                    ctx.status_print('偵測到尚未登入。請按任意鍵編輯 config.conf，填好帳號密碼後關閉編輯器。')
                     unauth_notice_state = 'manual_config'
                 await ctx.sleep_or_shutdown(shutdown_event, 5)
             continue
@@ -734,7 +734,7 @@ def run_monitor_forever(*, no_input: bool=False, ignore_attendance_rate_gate: ct
         return 1
     if no_input:
         if not ctx.config_is_ready_to_run():
-            print('config.conf 尚未填入可用的帳號密碼；無輸入模式不會開啟記事本，請先填好 config.conf 再啟動。')
+            print('config.conf 尚未填入可用的帳號密碼；無輸入模式不會開啟編輯器，請先填好 config.conf 再啟動。')
             return 1
         print('啟動自動登入與點名監控程式（無輸入模式）...')
         print(ctx.describe_group_target(ctx.CONFIG))
@@ -745,7 +745,7 @@ def run_monitor_forever(*, no_input: bool=False, ignore_attendance_rate_gate: ct
             # through into the monitor, which keeps waiting and lets the user press
             # any key to edit config.conf again.
             print(editor_result.get('message') or '尚未偵測到可用帳密，將進入監控；按任意鍵可開啟 config.conf 編輯。')
-        print('啟動監控。此視窗只輸出事件；按任意鍵會用舊版記事本開啟 config.conf。')
+        print('啟動監控。此視窗只輸出事件；按任意鍵會用文字編輯器開啟 config.conf。')
         print(ctx.describe_group_target(ctx.CONFIG))
     ctx.time.sleep(1)
     restart_count = 0
