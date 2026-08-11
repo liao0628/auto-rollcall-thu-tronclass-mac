@@ -49,13 +49,16 @@ jobs:
       - name: Package zip
         id: package
         shell: bash
+        # Python's zipfile (via shutil.make_archive) instead of the `zip` CLI —
+        # windows-latest's Git Bash doesn't reliably have `zip` on PATH, but
+        # Python is already set up in this job on both OSes.
         run: |
           VERSION="${GITHUB_REF_NAME:-dev-$(git rev-parse --short HEAD)}"
           NAME="THU_Auto_Rollcall-${VERSION}-windows-x64"
           mkdir -p dist/release
-          cd dist/pyinstaller
-          mv auto-rollcall-thu-tronclass "$NAME"
-          zip -r "../release/${NAME}.zip" "$NAME" >/dev/null
+          mv "dist/pyinstaller/auto-rollcall-thu-tronclass" "dist/pyinstaller/${NAME}"
+          python -c "import shutil,sys; shutil.make_archive(sys.argv[1], 'zip', root_dir=sys.argv[2], base_dir=sys.argv[3])" \
+            "dist/release/${NAME}" "dist/pyinstaller" "${NAME}"
           echo "path=dist/release/${NAME}.zip" >> "$GITHUB_OUTPUT"
 
       - name: Upload artifact
@@ -102,9 +105,9 @@ jobs:
           NAME="THU_Auto_Rollcall-${VERSION}-macos-arm64"
           mkdir -p dist/release
           chmod +x "dist/pyinstaller/auto-rollcall-thu-tronclass/auto-rollcall-thu-tronclass"
-          cd dist/pyinstaller
-          mv auto-rollcall-thu-tronclass "$NAME"
-          zip -r "../release/${NAME}.zip" "$NAME" >/dev/null
+          mv "dist/pyinstaller/auto-rollcall-thu-tronclass" "dist/pyinstaller/${NAME}"
+          python -c "import shutil,sys; shutil.make_archive(sys.argv[1], 'zip', root_dir=sys.argv[2], base_dir=sys.argv[3])" \
+            "dist/release/${NAME}" "dist/pyinstaller" "${NAME}"
           echo "path=dist/release/${NAME}.zip" >> "$GITHUB_OUTPUT"
 
       - name: Upload artifact
